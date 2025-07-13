@@ -5,7 +5,11 @@
     <script src="libraries/petite-vue.iife.js" defer init></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="libraries/xlsx.full.min.js"></script>
+    <script type="module">
+        // No global PDF.js script needed; will be imported dynamically in InventoryNegatives.js
+    </script>
     <script src="components/MissingZREC.js"></script>
+    <script src="components/InventoryNegatives.js"></script>
 </head>
 <body>
     <div id="loading-message" style="position:fixed;top:0;left:0;width:100vw;height:100vh;display:none;flex-direction:column;align-items:center;justify-content:center;z-index:50;background:rgba(245,245,245,0.98);color:#333;font-size:1.25rem;">
@@ -24,49 +28,10 @@
         <div class="min-h-screen bg-gray-50 py-12">
             <h1 class="text-4xl font-bold mb-12 text-center text-gray-800 tracking-tight">Safeway Tools</h1>
             <div class="max-w-5xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 px-4">
-                <!-- Missing ZREC Document Card -->
-                <div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center aspect-square min-h-[320px]">
-                    <h2 class="mb-4 text-lg font-semibold text-red-700">Missing ZREC Document</h2>
-                    <div v-scope="MissingZREC()" class="flex flex-col items-center justify-center flex-1 w-full">
-                        <span class="mb-2 text-center text-gray-700">Choose a file to check:</span>
-                        <label class="relative block w-full mb-4 cursor-pointer">
-                            <span class="block w-full px-4 py-2 text-center text-white bg-blue-600 rounded hover:bg-blue-800">Select File</span>
-                            <input type="file" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-                        </label>
-                        <div v-if="fileName" class="mt-2 text-sm text-center text-green-700">
-                            Selected: <span class="font-medium">{{ fileName }}</span>
-                        </div>
-                        <button v-if="fileName && parsedData" @click="showPreview = true" class="px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-800">Preview</button>
-                        <!-- Popup Preview -->
-                        <div v-if="showPreview" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
-                            <div class="relative w-full max-w-3xl max-h-[80vh] p-6 bg-white rounded-lg shadow-2xl" style="box-shadow: 0 16px 64px 16px rgba(30,41,59,0.28), 0 4px 24px 0 rgba(30,41,59,0.18);">
-                                <button @click="showPreview = false" class="absolute top-2 right-2 text-2xl text-gray-500 hover:text-gray-800">&times;</button>
-                                <h3 class="mb-4 text-lg font-bold">Preview: {{ fileName }}</h3>
-                                <div v-for="(rows, sheet) in parsedData" :key="sheet" class="mb-8">
-                                    <div v-if="rows.length">
-                                        <div class="overflow-x-auto overflow-y-auto max-h-96 rounded border border-gray-200">
-                                            <table class="min-w-full text-xs border-separate border-spacing-0">
-                                                <thead>
-                                                    <tr>
-                                                        <th v-for="(v, key) in rows[0]" :key="key" class="sticky top-0 z-10 px-3 py-2 text-left font-semibold text-gray-700 bg-gray-100 border-b border-gray-300 shadow-sm">{{ key }}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr v-for="(row, i) in rows" :key="i" class="even:bg-gray-50 hover:bg-blue-50">
-                                                        <td v-for="(v, key) in row" :key="key" class="px-3 py-1 whitespace-nowrap border-b border-gray-200">{{ v }}</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                    <div v-else class="text-gray-500">No data in this sheet.</div>
-                                    <!-- Print button below the table(s) -->
-                                    <button @click="printTable" class="px-4 py-2 mt-4 text-white bg-gray-700 rounded hover:bg-gray-900">Print</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <!-- ZREC Card will be injected here -->
+                <div id="zrec-card-container"></div>
+                <!-- Inventory Negatives Card will be injected here -->
+                <div id="inventory-negatives-card-container"></div>
             </div>
         </div>
     </div>
@@ -88,7 +53,10 @@
                 if (
                     window.PetiteVue &&
                     window.XLSX &&
-                    window.MissingZREC
+                    window.MissingZREC &&
+                    window.injectZRECCard &&
+                    window.InventoryNegatives &&
+                    window.injectInventoryNegativesCard
                 ) {
                     clearTimeout(loadingTimeout);
                     if (mainContent) mainContent.style.display = '';
@@ -96,6 +64,10 @@
                     if (loadingShown) {
                         console.log('Safeway Tools: Loading complete');
                     }
+                    // Inject the ZREC card into its container
+                    window.injectZRECCard('#zrec-card-container');
+                    // Inject the Inventory Negatives card into its container
+                    window.injectInventoryNegativesCard('#inventory-negatives-card-container');
                 } else {
                     setTimeout(showBodyWhenReady, 30);
                 }

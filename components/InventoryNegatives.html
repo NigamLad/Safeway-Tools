@@ -1,0 +1,48 @@
+<div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center aspect-square min-h-[320px]">
+    <h2 class="mb-4 text-lg font-semibold text-blue-700">Inventory Negatives</h2>
+    <div v-scope="InventoryNegatives()" class="flex flex-col items-center justify-center flex-1 w-full">
+        <span class="mb-2 text-center text-gray-700">This tool will help you analyze inventory negatives.</span>
+        <!-- Example: File input for future Excel/CSV uploads -->
+        <label class="relative block w-full mb-4 cursor-pointer">
+            <span class="block w-full px-4 py-2 text-center text-white bg-blue-600 rounded hover:bg-blue-800">Select File</span>
+            <input type="file" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+        </label>
+        <div v-if="fileName" class="mt-2 text-sm text-center text-green-700">
+            Selected: <span class="font-medium">{{ fileName }}</span>
+        </div>
+        <button v-if="fileName" @click="showPreview = true" class="px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-800">Preview</button>
+        <!-- Popup Preview (styled like MissingZREC) -->
+        <div v-if="showPreview" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+            <div class="relative w-full max-w-2xl max-h-[80vh] p-0 bg-white rounded-2xl shadow-2xl flex flex-col">
+                <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
+                    <h3 class="text-lg font-bold text-blue-700">Preview: {{ fileName }}</h3>
+                    <button @click="showPreview = false" class="text-2xl text-gray-400 hover:text-gray-700">&times;</button>
+                </div>
+                <div class="flex-1 overflow-y-auto px-6 py-4">
+                    <div v-if="Array.isArray(parsedData) && parsedData.length">
+                        <div class="overflow-x-auto overflow-y-auto max-h-96 rounded border border-gray-200">
+                            <table class="min-w-full text-xs border-separate border-spacing-0">
+                                <thead>
+                                    <tr>
+                                        <th v-for="(v, key) in parsedData[0]" :key="key" class="sticky top-0 z-10 px-3 py-2 text-left font-semibold text-gray-700 bg-gray-100 border-b border-gray-300 shadow-sm">{{ key }}</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="(row, i) in parsedData" :key="i" class="even:bg-gray-50 hover:bg-blue-50">
+                                        <td v-for="(v, key) in row" :key="key" class="px-3 py-1 whitespace-nowrap border-b border-gray-200">{{ v }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <!-- Print button below the table(s) -->
+                        <button @click="printTable" class="px-4 py-2 mt-4 text-white bg-gray-700 rounded hover:bg-gray-900">Print</button>
+                    </div>
+                    <div v-else-if="typeof parsedData === 'string' && parsedData.trim().length > 0" class="overflow-y-auto max-h-96 border border-gray-200 rounded p-4 bg-gray-50 text-xs whitespace-pre-wrap font-mono text-gray-800">
+                        {{ parsedData }}
+                    </div>
+                    <div v-else class="text-gray-500">No data to preview.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
