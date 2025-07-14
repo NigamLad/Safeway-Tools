@@ -1,15 +1,28 @@
-<div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col items-center justify-center aspect-square min-h-[320px]">
-    <h2 class="mb-4 text-lg font-semibold text-red-700">Missing ZREC Document</h2>
-    <div v-scope="MissingZREC()" class="flex flex-col items-center justify-center flex-1 w-full">
-        <span class="mb-2 text-center text-gray-700">Choose a file to check:</span>
-        <label class="relative block w-full mb-4 cursor-pointer">
-            <span class="block w-full px-4 py-2 text-center text-white bg-blue-600 rounded hover:bg-blue-800">Select File</span>
-            <input type="file" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
-        </label>
-        <div v-if="fileName" class="mt-2 text-sm text-center text-green-700">
-            Selected: <span class="font-medium">{{ fileName }}</span>
+
+<div class="bg-white rounded-2xl shadow-lg p-6 flex flex-col aspect-square min-h-[320px] h-full" style="min-width:260px;">
+    <!-- Title always at the top -->
+    <h2 class="text-lg font-semibold text-red-700 mb-2 text-center">Missing ZREC Invoices</h2>
+    <!-- Instructions slot (add here if needed) -->
+    <!-- <div class="mb-2 text-xs text-gray-600 text-center">Instructions go here if needed.</div> -->
+    <div v-scope="MissingZREC()" class="flex flex-col flex-1">
+        <!-- Description centered in the card -->
+        <div class="flex-1 flex flex-col justify-center items-center">
+            <span class="mb-2 text-center text-gray-700">This will format the spreadsheet for missing ZREC invoices.</span>
         </div>
-        <button v-if="fileName && parsedData" @click="showPreview = true" class="px-4 py-2 mt-4 text-white bg-blue-600 rounded hover:bg-blue-800">Preview</button>
+        <!-- Preview info/button above file input -->
+        <div class="flex flex-col items-center mb-2">
+            <div v-if="fileName" class="text-sm text-center text-green-700 mb-1">
+                Selected: <span class="font-medium">{{ fileName }}</span>
+            </div>
+            <button v-if="fileName && parsedData" @click="showPreview = true" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-800 mb-2">Preview</button>
+        </div>
+        <!-- File input always at the bottom -->
+        <div class="mt-auto">
+            <label class="relative block w-full cursor-pointer">
+                <span class="block w-full px-4 py-2 text-center text-white bg-blue-600 rounded hover:bg-blue-800">Select File</span>
+                <input type="file" @change="handleFileChange" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" />
+            </label>
+        </div>
         <!-- Popup Preview -->
         <div v-if="showPreview" class="fixed inset-0 z-50 flex items-center justify-center bg-transparent backdrop-blur-sm">
             <div class="relative w-full max-w-6xl max-h-[80vh] p-6 bg-white rounded-lg shadow-2xl" style="box-shadow: 0 16px 64px 16px rgba(30,41,59,0.28), 0 4px 24px 0 rgba(30,41,59,0.18);">

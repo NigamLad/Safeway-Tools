@@ -134,6 +134,7 @@ window.InventoryNegatives = function() {
     return {
         fileName: '',
         showPreview: false,
+        showInstructions: false,
         parsedData: null,
         selectedFile: null,
         handleFileChange(e) {
