@@ -102,9 +102,29 @@ function parseInventoryNegativesPDF(file) {
                         headers.forEach((h, idx) => {
                             if (keepFields.includes(h)) obj[h] = row[idx];
                         });
+                        // Render barcode SVG in SKU field, with SKU number below
+                        if (obj["SKU"] && window.JsBarcode) {
+                            try {
+                                const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                                // Remove dashes from SKU before generating barcode
+                                const value = obj["SKU"].replace(/-/g, "");
+                                window.JsBarcode(svg, value, {
+                                    format: "CODE128",
+                                    width: 1.2,
+                                    height: 60,
+                                    margin: 12,
+                                    displayValue: true,
+                                    fontSize: 18,
+                                    textMargin: 4
+                                });
+                                obj["SKU"] = svg.outerHTML;
+                            } catch (e) {
+                                // fallback to plain text
+                            }
+                        }
                         return obj;
                     });
-                    console.log('[parseInventoryNegativesPDF] Parsed PDF Table Data (filtered):', result);
+                    console.log('[parseInventoryNegativesPDF] Parsed PDF Table Data (filtered, with barcode):', result);
                     resolve(result);
                 } else {
                     console.log('[parseInventoryNegativesPDF] No table detected, showing raw rows:', allRows);
@@ -165,7 +185,26 @@ window.InventoryNegatives = function() {
             if (popup) {
                 const tables = popup.querySelectorAll('table');
                 tables.forEach(table => {
-                    tablesHtml += table.outerHTML + '<br/>';
+                    // Clone table to avoid modifying the original
+                    const clone = table.cloneNode(true);
+                    // Add new header cell with checkbox icon
+                    const thead = clone.querySelector('thead');
+                    if (thead && thead.rows.length > 0) {
+                        const headerRow = thead.rows[0];
+                        const th = document.createElement('th');
+                        th.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+                        headerRow.appendChild(th);
+                    }
+                    // Add empty cell to each data row
+                    const tbody = clone.querySelector('tbody');
+                    if (tbody) {
+                        Array.from(tbody.rows).forEach(row => {
+                            const td = document.createElement('td');
+                            td.innerHTML = '';
+                            row.appendChild(td);
+                        });
+                    }
+                    tablesHtml += clone.outerHTML + '<br/>';
                 });
             }
             if (!tablesHtml) {
@@ -173,13 +212,18 @@ window.InventoryNegatives = function() {
                 return;
             }
             const printWindow = window.open('', '', 'width=900,height=700');
+            // Enlarge barcodes for print preview only and center them
+            tablesHtml = tablesHtml.replace(/(<svg[^>]*)(width="[^"]*")?( height="[^"]*")?/g, function(match, svgTag, widthAttr, heightAttr) {
+                // Set width and height for print and add center style
+                return svgTag + ' width="400" height="160" style="display:block;margin:auto;"';
+            });
             printWindow.document.write(`
                 <html><head>
                 <title>Print Table</title>
                 <style>
-                    body { font-family: sans-serif; background: #f9fafb; margin: 0; padding: 2em; }
-                    table { border-collapse: collapse; width: 100%; font-size: 13px; }
-                    th, td { border: 1px solid #d1d5db; padding: 6px 10px; }
+                    body { font-family: sans-serif; background: #f9fafb; margin: 0; font-size: 4.2rem; }
+                    table { border-collapse: collapse; width: 100%; font-size: 3.4rem; }
+                    th, td { border: 1px solid #d1d5db; padding: 12px 18px; }
                     th { background: #f3f4f6; }
                     tr:nth-child(even) { background: #f9fafb; }
                 </style>

@@ -26,13 +26,40 @@ function MissingZREC() {
         printTable() {
             // ...existing code...
             let tablesHtml = '';
+            // Helper to add a blank column with a checkmark header to a table's HTML
+            function addCheckmarkColumn(tableHtml) {
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(tableHtml, 'text/html');
+                const table = doc.querySelector('table');
+                if (!table) return tableHtml;
+                // Add checkmark header
+                const thead = table.querySelector('thead');
+                if (thead) {
+                    const headerRow = thead.querySelector('tr');
+                    if (headerRow) {
+                        const th = doc.createElement('th');
+                        th.innerHTML = '&#10003;'; // checkmark
+                        th.style.textAlign = 'center';
+                        headerRow.appendChild(th);
+                    }
+                }
+                // Add blank cell to each row in tbody
+                const tbody = table.querySelector('tbody');
+                if (tbody) {
+                    tbody.querySelectorAll('tr').forEach(row => {
+                        const td = doc.createElement('td');
+                        td.innerHTML = '';
+                        row.appendChild(td);
+                    });
+                }
+                return table.outerHTML;
+            }
             if (this.showPreview) {
-                // Updated selector to match the new max-w-6xl class
                 const popup = document.querySelector('.fixed.inset-0 .max-w-6xl');
                 if (popup) {
                     const tables = popup.querySelectorAll('table');
                     tables.forEach(table => {
-                        tablesHtml += table.outerHTML + '<br/>';
+                        tablesHtml += addCheckmarkColumn(table.outerHTML) + '<br/>';
                     });
                 }
             } else {
@@ -40,7 +67,7 @@ function MissingZREC() {
                 if (card) {
                     const tables = card.querySelectorAll('table');
                     tables.forEach(table => {
-                        tablesHtml += table.outerHTML + '<br/>';
+                        tablesHtml += addCheckmarkColumn(table.outerHTML) + '<br/>';
                     });
                 }
             }
@@ -54,9 +81,9 @@ function MissingZREC() {
                 <title>Print Table</title>
                 <style>
                     body { font-family: sans-serif; background: #f9fafb; margin: 0; padding: 2em; }
-                    table { border-collapse: collapse; width: 100%; font-size: 13px; }
-                    th, td { border: 1px solid #d1d5db; padding: 6px 10px; }
-                    th { background: #f3f4f6; }
+                    table { border-collapse: collapse; width: 100%; font-size: 18px; }
+                    th, td { border: 1px solid #d1d5db; padding: 10px 16px; }
+                    th { background: #f3f4f6; font-size: 20px; }
                     tr:nth-child(even) { background: #f9fafb; }
                 </style>
                 </head><body>` + tablesHtml + `</body></html>`);
@@ -90,12 +117,7 @@ function MissingZREC() {
                     return;
                 }
                 const keepColumns = [
-                    'Document number',
                     'Reference',
-                    'Posting date',
-                    'Profit Center',
-                    'Document Date',
-                    'Invoicing Party',
                     'Name of vendor',
                     'Payment reference',
                     'Net Value',

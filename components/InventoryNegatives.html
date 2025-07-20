@@ -58,15 +58,15 @@
         </div>
         <!-- Popup Preview (styled like MissingZREC) -->
         <div v-if="showPreview" class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-            <div class="relative w-full max-w-2xl max-h-[80vh] p-0 bg-white rounded-2xl shadow-2xl flex flex-col">
+            <div class="relative w-full max-w-2xl max-h-[80vh] p-0 bg-white rounded-2xl shadow-2xl flex flex-col" style="font-size:1.35rem;">
                 <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 rounded-t-2xl">
-                    <h3 class="text-lg font-bold text-blue-700">Preview: {{ fileName }}</h3>
-                    <button @click="showPreview = false" class="text-2xl text-gray-400 hover:text-gray-700">&times;</button>
+                    <h3 class="text-2xl font-bold text-blue-700">Preview: {{ fileName }}</h3>
+                    <button @click="showPreview = false" class="text-3xl text-gray-400 hover:text-gray-700">&times;</button>
                 </div>
                 <div class="flex-1 overflow-y-auto px-6 py-4">
                     <div v-if="Array.isArray(parsedData) && parsedData.length">
                         <div class="overflow-x-auto overflow-y-auto max-h-96 rounded border border-gray-200">
-                            <table class="min-w-full text-xs border-separate border-spacing-0">
+                            <table class="min-w-full border-separate border-spacing-0" style="font-size:1.15rem;">
                                 <thead>
                                     <tr>
                                         <th v-for="(v, key) in parsedData[0]" :key="key" class="sticky top-0 z-10 px-3 py-2 text-left font-semibold text-gray-700 bg-gray-100 border-b border-gray-300 shadow-sm">{{ key }}</th>
@@ -74,18 +74,23 @@
                                 </thead>
                                 <tbody>
                                     <tr v-for="(row, i) in parsedData" :key="i" class="even:bg-gray-50 hover:bg-blue-50">
-                                        <td v-for="(v, key) in row" :key="key" class="px-3 py-1 whitespace-nowrap border-b border-gray-200">{{ v }}</td>
+                                        <td v-for="(v, key) in row" :key="key" class="px-3 py-2 whitespace-nowrap border-b border-gray-200" style="font-size:1.15rem;">
+                                            <span v-if="key === 'SKU'" style="display:flex;justify-content:center;align-items:center;padding:10px 0;">
+                                                <span v-html="v" style="display:block;text-align:center;"></span>
+                                            </span>
+                                            <span v-else>{{ v }}</span>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
                         <!-- Print button below the table(s) -->
-                        <button @click="printTable" class="px-4 py-2 mt-4 text-white bg-gray-700 rounded hover:bg-gray-900">Print</button>
+                        <button @click="printTable" class="px-4 py-2 mt-4 text-white bg-gray-700 rounded hover:bg-gray-900" style="font-size:1.15rem;">Print</button>
                     </div>
-                    <div v-else-if="typeof parsedData === 'string' && parsedData.trim().length > 0" class="overflow-y-auto max-h-96 border border-gray-200 rounded p-4 bg-gray-50 text-xs whitespace-pre-wrap font-mono text-gray-800">
+                    <div v-else-if="typeof parsedData === 'string' && parsedData.trim().length > 0" class="overflow-y-auto max-h-96 border border-gray-200 rounded p-4 bg-gray-50 whitespace-pre-wrap font-mono text-gray-800" style="font-size:1.15rem;">
                         {{ parsedData }}
                     </div>
-                    <div v-else class="text-gray-500">No data to preview.</div>
+                    <div v-else class="text-gray-500" style="font-size:1.15rem;">No data to preview.</div>
                 </div>
             </div>
         </div>

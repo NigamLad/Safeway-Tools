@@ -34,12 +34,12 @@
                             <table class="min-w-full text-xs border-separate border-spacing-0">
                                 <thead>
                                     <tr>
-                                        <th v-for="(v, key) in rows[0]" :key="key" class="sticky top-0 z-10 px-3 py-2 text-left font-semibold text-gray-700 bg-gray-100 border-b border-gray-300 shadow-sm">{{ key }}</th>
+                                        <th v-for="(v, key) in rows[0]" :key="key" class="sticky top-0 z-10 px-3 py-2 text-left font-semibold text-gray-700 bg-gray-100 border-b border-gray-300 shadow-sm text-base">{{ key }}</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr v-for="(row, i) in rows" :key="i" class="even:bg-gray-50 hover:bg-blue-50">
-                                        <td v-for="(v, key) in row" :key="key" class="px-3 py-1 whitespace-nowrap border-b border-gray-200">{{ v }}</td>
+                                        <td v-for="(v, key) in row" :key="key" class="px-3 py-2 whitespace-nowrap border-b border-gray-200 text-base">{{ v }}</td>
                                     </tr>
                                 </tbody>
                             </table>
